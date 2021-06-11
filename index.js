@@ -1,14 +1,19 @@
+const fs = require('fs');
+const https = require('https');
 const WebSocket = require('ws');
 
-const wss = new WebSocket.Server({ port: 8080 });
+const server = https.createServer({
+  cert: fs.readFileSync('certificate.pem'),
+  key: fs.readFileSync('key.pem')
+});
+const wss = new WebSocket.Server({ server });
 
 wss.on('connection', function connection(ws) {
   ws.on('message', function incoming(message) {
     console.log('received: %s', message);
-    setTimeout(function timeout() {
-        ws.send(Date.now());
-      }, 500);
   });
 
   ws.send('something');
 });
+
+server.listen(8080);
